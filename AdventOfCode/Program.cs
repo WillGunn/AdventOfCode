@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode
 {
@@ -12,15 +13,162 @@ namespace AdventOfCode
     {
         static void Main(string[] args)
         {
-            day6(2);
+            day10(1);
 
             System.Console.ReadKey();
         }
 
+        static void day10(int part = 1)
+        {
+            string input = "3113322113";
+            string output = input;
+            int i = 0;
+            for (i = 0; i < 50; ++i)
+            {
+                //output = day10StringCountModifier(output);
+                output = day10LookAndSay(output);
+                System.Console.WriteLine($"{i+1}: {output.Length}");
+            }
+
+        }
+
+        static string day10StringCountModifier(string input)
+        {
+            //var lastCharCount = new Tuple<char, int>((char)0,0);
+
+            var pair = new Pair<char, int>();
+
+            string output = "";
+
+            foreach (char c in input)
+            {
+                if (pair.First==c)
+                {
+                    pair.Second = pair.Second + 1;
+                }
+                else
+                {
+                    if (pair.First != (char) 0)
+                    {
+                        output = output + pair.Second + pair.First;
+                    }
+                    pair.First = c;
+                    pair.Second = 1;
+                }
+            }
+
+            output = output + pair.Second + pair.First;
+
+            return output;
+        }
+
+        static string day10LookAndSay(string arg)
+        {
+            var captures = Regex.Match(arg, @"((.)\2*)+").Groups[1].Captures;
+            return string.Concat(
+                from c in captures.Cast<Capture>()
+                let v = c.Value
+                select v.Length + v.Substring(0, 1));
+        }
+
+
+
+        static void day9(int part = 1)
+        {
+            if (part == 1)
+            {
+                StreamReader file = new StreamReader(@"9.txt");
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+
+                }
+            }
+            else
+            {
+                StreamReader file = new StreamReader(@"9.txt");
+                string line;
+                int extraChars = 0;
+                while ((line = file.ReadLine()) != null)
+                {
+                    int temp = day8_parseLinePart2(line);
+                    extraChars += temp;
+                    System.Console.WriteLine(line + temp.ToString());
+                    //System.Console.ReadKey();
+                }
+                System.Console.WriteLine(extraChars);
+            }
+        }
+
         static void day8(int part = 1)
         {
+            if (part == 1)
+            {
+                StreamReader file = new StreamReader(@"8.txt");
+                string line;
+                int extraChars = 0;
+                while ((line = file.ReadLine()) != null)
+                {
+                    int temp = day8_parseLinePart1(line);
+                    extraChars += temp;
+                    System.Console.WriteLine(line + temp.ToString());
+                    //System.Console.ReadKey();
+                }
+                System.Console.WriteLine(extraChars);
+            }
+            else
+            {
+                StreamReader file = new StreamReader(@"8.txt");
+                string line;
+                int extraChars = 0;
+                while ((line = file.ReadLine()) != null)
+                {
+                    int temp = day8_parseLinePart2(line);
+                    extraChars += temp;
+                    System.Console.WriteLine(line + temp.ToString());
+                    //System.Console.ReadKey();
+                }
+                System.Console.WriteLine(extraChars);
+            }
+        }
 
+        static int day8_parseLinePart2(string line)
+        {
+            int count = 2;
+            string oldline = line;
+            line = line.Replace("\\", "*");
+            line = line.Replace("\"","\\\"");
+            line = line.Replace("\\x", "&");
+            line = line.Replace("*", "\\\\");
+            line = line.Replace("&", "\\\\x");
 
+            count += line.Length - oldline.Length;
+
+            return count;
+        }
+
+        static int day8_parseLinePart1(string line)
+        {
+            int count = 2;
+            int slash = 0;
+            string newline = "";
+            for(int i = 1;i<line.Length-1;++i)
+            {
+                if (line[i] == '\\' && line[i + 1] == '\\')
+                {
+                    ++i;
+                    ++slash;
+                }
+                else
+                {
+                    newline += line[i];
+                }
+            }
+            count += slash;
+            count += (newline.Length - newline.Replace("\\\"", "\"").Length);
+            count += (newline.Length - newline.Replace("\\x", "").Length)*3/2;
+
+            return count;
         }
 
         static void day7(int part = 1)
@@ -180,9 +328,6 @@ namespace AdventOfCode
 
 
             }
-
-            
-
 
         }
 
@@ -457,6 +602,17 @@ namespace AdventOfCode
         }
     }
 
+    public class Pair<T1, T2>
+    {
+        public T1 First { get; set; }
+        public T2 Second { get; set; }
+    }
+
+    class day9
+    {
+        List<string> stopList = new List<string>();
+    }
+
     class Day6
     {
         static int size = 1000;
@@ -558,7 +714,7 @@ namespace AdventOfCode
                 for (int j = 0; j < size; ++j)
                 {
                     brightness += array[i, j];
-                    
+
                 }
             }
             return brightness;
